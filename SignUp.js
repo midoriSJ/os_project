@@ -75,17 +75,38 @@ const SignUp = () => {
                 <View style = {styles.checkBoxContainer}>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxSports}
-                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                            value={checkBoxFishing}
+                            onValueChange={(fishing) => setCheckBoxFishing(fishing)}
                         />
                         <Text style={styles.checkBoxText}>서핑</Text>
                     </View>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxFishing}
-                            onValueChange={(fishing) => setCheckBoxFishing(fishing)}
+                            value={checkBoxSports}
+                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                        />
+                        <Text style={styles.checkBoxText}>등산</Text>
+                    </View>
+                    <View style={styles.checkBox}>
+                        <CheckBox
+                            value={checkBoxSports}
+                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                        />
+                        <Text style={styles.checkBoxText}>바다 낚시</Text>
+                    </View>
+                    <View style={styles.checkBox}>
+                        <CheckBox
+                            value={checkBoxSports}
+                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
                         />
                         <Text style={styles.checkBoxText}>어업</Text>
+                    </View>
+                    <View style={styles.checkBox}>
+                        <CheckBox
+                            value={checkBoxSports}
+                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                        />
+                        <Text style={styles.checkBoxText}>농업</Text>
                     </View>
                 </View>
             </ScrollView>
