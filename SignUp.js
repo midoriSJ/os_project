@@ -4,34 +4,41 @@ import { StyleSheet, View, Text, TextInput, Button, Alert, Picker, ScrollView, C
 const SignUp = () => {
     const [userId, setUserId] = useState("");
     const [userPassword, setUserPassword] = useState("");
-    const [checkValidUserId, setCheckValidUserId] = useState(false); 
-    const [checkValidUserPassword, setCheckValidUserPassword] = useState(false);
-    const [checkBoxSports, setCheckBoxSports] = useState(false)
+    const [isValidUserId, setIsValidUserId] = useState(false); 
+    const [isValidUserPassword, setIsValidUserPassword] = useState(false);
+    const [checkBoxSurfing, setCheckBoxSurfing] = useState(false)
+    const [checkBoxMountainClimbing, setCheckBoxMountainClimbing] = useState(false)
+    const [checkBoxSeaFishing, setCheckBoxSeaFishing] = useState(false)
     const [checkBoxFishing, setCheckBoxFishing] = useState(false)
+    const [checkBoxFarming, setCheckBoxFarming] = useState(false)
     const [userAge, setUserAge] = useState("1")
 
-    const validUserId = (input) => {
+    const validateUserId = (input) => {
         const userIdRegex = /^[a-zA-Z0-9]{5,10}$/;
-        setCheckValidUserId(userIdRegex.test(input));
+        setIsValidUserId(userIdRegex.test(input));
     };
 
-    const validUserPassword = (input) => {
+    const validateUserPassword = (input) => {
         const userPasswordRegex = /^[a-zA-Z0-9]{10,16}$/;
-        setCheckValidUserPassword(userPasswordRegex.test(input)); // 비밀번호 유효성 검사 결과를 상태로 저장
+        setIsValidUserPassword(userPasswordRegex.test(input)); // 비밀번호 유효성 검사 결과를 상태로 저장
     };
 
     const handleUserIdChange = (input) => {
         setUserId(input);
-        validUserId(input);
+        validateUserId(input);
     };
 
     const handleUserPasswordChange = (input) => {
         setUserPassword(input);
-        validUserPassword(input);
+        validateUserPassword(input);
     };
 
     const handleCheckDuplicate = () => {
         // 중복확인 로직
+    };
+
+    const handleSignUp = () => {
+        // 회원가입 로직
     };
 
     return (
@@ -39,75 +46,81 @@ const SignUp = () => {
             <ScrollView>
                 <Text>아이디</Text>
                 <TextInput
-                    style = {styles.input} // 입력 받는 타입으로 칸 생성
-                    placeholder = "영어와 숫자로 5~10자리" // 빈칸일 때는 출력했다가 유저가 입력할 때는 사라지게 만들기
-                    value = {userId} // 빈칸에 입력된 문자열은 userId에 저장
-                    onChangeText = {handleUserIdChange} // 입력값이 변경될 때마다 유효성 검사 수행
-                ></TextInput>
+                    style={styles.input}
+                    placeholder="영어와 숫자로 5~10자리"
+                    value={userId}
+                    onChangeText={handleUserIdChange}
+                />
                 <Button 
-                    title = "중복확인" 
-                    onPress = {handleCheckDuplicate} 
-                    disabled = {!userId || !isValidUserId} // 아이디가 비어있거나 유효하지 않으면 비활성화
-                ></Button>
+                    title="중복확인" 
+                    onPress={handleCheckDuplicate} 
+                    disabled={!userId || !isValidUserId}
+                />
                 <Text>비밀번호</Text>
                 <TextInput
-                    style = {styles.input}
-                    placeholder = "영어와 숫자로 10~16자리"
-                    secureTextEntry = {true} // 유저가 입력하면 마스킹된 형태로 출력
-                    value = {userPassword}
-                    onChangeText = {setUserPassword}
-                ></TextInput>
+                    style={styles.input}
+                    placeholder="영어와 숫자로 10~16자리"
+                    secureTextEntry={true}
+                    value={userPassword}
+                    onChangeText={handleUserPasswordChange}
+                />
 
                 <Text>연령</Text>
                 <Picker 
-                  style = {styles.picker}
-                  selectedValue = {userAge}
-                  onValueChange = {(itemValue, itemIndex) => setUserAge(itemValue)}
-                  >
-                  <Picker.Item label = "1" value = "1"/>
-                  <Picker.Item label = "2" value = "2"/>
-                  <Picker.Item label = "3" value = "3"/>
-                  <Picker.Item label = "4" value = "4"/>
-                  <Picker.Item label = "5" value = "5"/>
+                    style={styles.picker}
+                    selectedValue={userAge}
+                    onValueChange={(itemValue, itemIndex) => setUserAge(itemValue)}
+                >
+                    {[...Array(120)].map((_, index) => (
+                        <Picker.Item key={index} label={`${index + 1}`} value={`${index + 1}`} />
+                    ))}
                 </Picker>
 
                 <Text>분야</Text>
-                <View style = {styles.checkBoxContainer}>
+                <View style={styles.checkBoxContainer}>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxFishing}
-                            onValueChange={(fishing) => setCheckBoxFishing(fishing)}
+                            value={checkBoxSurfing}
+                            onValueChange={(surfing) => setCheckBoxSurfing(surfing)}
                         />
                         <Text style={styles.checkBoxText}>서핑</Text>
                     </View>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxSports}
-                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                            value={checkBoxMountainClimbing}
+                            onValueChange={(mountainClimbing) => setCheckBoxMountainClimbing(mountainClimbing)}
                         />
                         <Text style={styles.checkBoxText}>등산</Text>
                     </View>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxSports}
-                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                            value={checkBoxSeaFishing}
+                            onValueChange={(seaFishing) => setCheckBoxSeaFishing(seaFishing)}
                         />
                         <Text style={styles.checkBoxText}>바다 낚시</Text>
                     </View>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxSports}
-                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                            value={checkBoxFishing}
+                            onValueChange={(fishing) => setCheckBoxFishing(fishing)}
                         />
                         <Text style={styles.checkBoxText}>어업</Text>
                     </View>
                     <View style={styles.checkBox}>
                         <CheckBox
-                            value={checkBoxSports}
-                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                            value={checkBoxFarming}
+                            onValueChange={(farming) => setCheckBoxFarming(farming)}
                         />
                         <Text style={styles.checkBoxText}>농업</Text>
                     </View>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Button
+                        title="회원가입"
+                        onPress={handleSignUp}
+                        disabled={!userId || !userPassword || !isValidUserId || !isValidUserPassword}
+                        style = {styles.signUpButton}
+                    />
                 </View>
             </ScrollView>
         </View>
@@ -144,6 +157,15 @@ const styles = StyleSheet.create({
     checkBoxText: {
         marginLeft: 5
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 20,
+    },
+    signUpButton : {
+        fontSize : 18,
+        paddingHorizontal : 20,
+    },
 });
 
-export default SignUp
+export default SignUp;
