@@ -72,17 +72,21 @@ const SignUp = () => {
                 </Picker>
 
                 <Text>분야</Text>
-                <View style = {styles.checkBox}>
-                    <CheckBox
-                        value = {checkBoxSports}
-                        onValueChange = {(surfing) => setCheckBoxSports(surfing)}
-                    />
-                    <Text style = {styles.checkBoxText}>서핑</Text>
-                    <CheckBox
-                        value = {checkBoxFishing}
-                        onValueChange = {(fishing) => setCheckBoxFishing(fishing)}
-                    />
-                    <Text style = {styles.checkBoxText}>어업</Text>
+                <View style = {styles.checkBoxContainer}>
+                    <View style={styles.checkBox}>
+                        <CheckBox
+                            value={checkBoxSports}
+                            onValueChange={(surfing) => setCheckBoxSports(surfing)}
+                        />
+                        <Text style={styles.checkBoxText}>서핑</Text>
+                    </View>
+                    <View style={styles.checkBox}>
+                        <CheckBox
+                            value={checkBoxFishing}
+                            onValueChange={(fishing) => setCheckBoxFishing(fishing)}
+                        />
+                        <Text style={styles.checkBoxText}>어업</Text>
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -90,30 +94,34 @@ const SignUp = () => {
 }
 
 const styles = StyleSheet.create({
-    container : {
-        flex : 1,
-        justifyContent : "center",
-        padding : 20,
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        padding: 20,
     },
-    input : {
-        borderWidth : 1,
-        borderColor : "gray",
-        borderRadius : 5,
-        padding : 10,
-        marginBottom : 10,
+    input: {
+        borderWidth: 1,
+        borderColor: "gray",
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
     },
-    picker : {
-        height : 50,
-        width : 100,
-        flex : 1,
-        alignItems : "center",
+    picker: {
+        height: 50,
+        width: 100,
+        flex: 1,
+        alignItems: "center",
     },
-    checkBox : {
-        flexDirection : 'row',
-        alignItems : 'center'
+    checkBoxContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start'
     },
-    checkBoxText : {
-        marginLeft : 5
+    checkBox: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    checkBoxText: {
+        marginLeft: 5
     },
 });
 
