@@ -4,7 +4,7 @@ import requests
 
 app = Flask(__name__)
 
-@app.route('/api/data', methods=['POST'])
+@app.route('/api/data', methods=['GET'])
 def receive_data():
     data = request.json
     print('Received data:', data)
@@ -13,4 +13,4 @@ def receive_data():
     return jsonify({'message': 'Data received successfully'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

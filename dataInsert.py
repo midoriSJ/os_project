@@ -32,5 +32,6 @@ def create_app():
 
     if __name__ == '__main__':
         app.run(port=port)
+        insert_data()
 
 create_app()
