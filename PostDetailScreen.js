@@ -1,11 +1,9 @@
-// 게시글 선택해서 들어가면 나오는 페이지
-
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function PostDetailScreen({ route }) {
-  const { post } = route.params;
+  const { post, boardTitle } = route.params;
   const [comments, setComments] = useState([
     { id: 1, user: '아이디', content: '댓글~~~\n댓글~~~', date: '5/26 20:19' },
     { id: 2, user: '아이디', content: '댓글~~~\n댓글~~~', date: '5/26 20:19' }
@@ -25,7 +23,7 @@ export default function PostDetailScreen({ route }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backButton}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>자유게시판 or 모임게시판</Text>
+        <Text style={styles.headerTitle}>{boardTitle}</Text>
         <TouchableOpacity>
           <Text style={styles.moreButton}>⋮</Text>
         </TouchableOpacity>
@@ -42,17 +40,15 @@ export default function PostDetailScreen({ route }) {
           <Text style={styles.postTitle}>{post.title}</Text>
           <Text style={styles.postContent}>{post.content}</Text>
           <View style={styles.imageContainer}>
-            {post.images.map((image, index) => (
-              <View key={index} style={styles.imageWrapper}>
-                <Text style={styles.imageText}>사진</Text>
-              </View>
+            {post.images && post.images.map((image, index) => (
+              <Image key={index} source={{ uri: image }} style={styles.image} />
             ))}
           </View>
         </View>
         <View style={styles.commentsContainer}>
           {comments.map(comment => (
             <View key={comment.id} style={styles.comment}>
-              <Image source={'../assets/avatar.png'} style={styles.avatar} />
+              <Image source={require('../assets/avatar.png')} style={styles.avatar} />
               <View style={styles.commentContent}>
                 <Text style={styles.username}>{comment.user}</Text>
                 <Text style={styles.commentText}>{comment.content}</Text>
@@ -141,18 +137,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  imageWrapper: {
+  image: {
     width: 100,
     height: 100,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: 8,
     marginBottom: 8,
-  },
-  imageText: {
-    fontSize: 16,
-    color: '#888',
   },
   commentsContainer: {
     borderTopWidth: 1,

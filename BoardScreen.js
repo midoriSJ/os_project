@@ -1,61 +1,64 @@
-// 게시판 리스트 나오는 화면
-
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+// BoardScreen.js
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const samplePosts = [
   {
-    title: 'ㄱ',
-    content: 'ㄱ',
-    author: 'ㄱ',
-    image: null,
+    boardType: '자유게시판',
+    title: '제목1',
+    content: '내용1',
+    author: '아이디1',
+    createdAt: '2024.5.26',
+    comments: [
+      { author: '아이디1', content: '댓글1', createdAt: '2024.5.26 20:19' },
+      { author: '아이디2', content: '댓글2', createdAt: '2024.5.26 20:19' },
+    ],
   },
   {
-    title: 'ㄱ',
-    content: 'ㄱ',
-    author: 'ㄱ',
-    image: null,
+    boardType: '모임게시판',
+    title: '제목2',
+    content: '내용2',
+    author: '아이디2',
+    createdAt: '2024.5.26',
+    comments: [],
   },
-  {
-    title: 'ㄱ',
-    content: 'ㄱ',
-    author: 'ㄱ',
-    image: null,
-  },
-  {
-    title: 'ㄱ',
-    content: 'ㄱ',
-    author: 'ㄱ',
-    image: null,
-  },
-  {
-    title: 'ㄱ',
-    content: 'ㄱ',
-    author: 'ㄱ',
-    image: null,
-  },
+  // 다른 게시글들...
 ];
 
 export default function BoardScreen() {
+  const [selectedTab, setSelectedTab] = useState('자유게시판');
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    setFilteredPosts(samplePosts.filter(post => post.boardType === selectedTab));
+  }, [selectedTab]);
+
+  const navigateToPostDetail = (post) => {
+    navigation.navigate('PostDetail', { post, boardTitle: selectedTab });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>게시판</Text>
       <View style={styles.tabContainer}>
-        <Text style={styles.tab}>자유게시판</Text>
-        <Text style={[styles.tab, styles.activeTab]}>모임게시판</Text>
+        <TouchableOpacity onPress={() => setSelectedTab('자유게시판')}>
+          <Text style={[styles.tab, selectedTab === '자유게시판' && styles.activeTab]}>자유게시판</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setSelectedTab('모임게시판')}>
+          <Text style={[styles.tab, selectedTab === '모임게시판' && styles.activeTab]}>모임게시판</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollContainer}>
-        {samplePosts.map((post, index) => (
-          <View key={index} style={styles.postContainer}>
+        {filteredPosts.map((post, index) => (
+          <TouchableOpacity key={index} style={styles.postContainer} onPress={() => navigateToPostDetail(post)}>
             <View style={styles.postContent}>
               <Text style={styles.postTitle}>{post.title}</Text>
               <Text style={styles.postText}>{post.content}</Text>
               <Text style={styles.postAuthor}>{post.author}</Text>
             </View>
-            {post.image && (
-              <Image source={{ uri: post.image }} style={styles.postImage} />
-            )}
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
@@ -80,6 +83,7 @@ const styles = StyleSheet.create({
   tab: {
     fontSize: 18,
     marginRight: 20,
+    paddingBottom: 5,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -111,10 +115,5 @@ const styles = StyleSheet.create({
   postAuthor: {
     fontSize: 14,
     color: '#777',
-  },
-  postImage: {
-    width: 60,
-    height: 60,
-    marginLeft: 10,
   },
 });
