@@ -1,9 +1,23 @@
-// 하단 탭에서 홈 누르면 나오는 페이지
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import axios from 'axios';
 
 export default function HomeScreen() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://your-server-ip:3000/recent-posts');
+        setPosts(response.data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -38,13 +52,9 @@ export default function HomeScreen() {
       <View style={styles.boardSection}>
         <Text style={styles.sectionTitle}>게시판</Text>
         <View style={styles.boardCard}>
-          <Text>자유게시판 (제목)</Text>
-          <Text>모임게시판 (제목)</Text>
-          <Text>자유게시판 (제목)</Text>
-          <Text>자유게시판 (제목)</Text>
-          <Text>모임게시판 (제목)</Text>
-          <Text>자유게시판 (제목)</Text>
-          <Text>모임게시판 (제목)</Text>
+          {posts.map((post, index) => (
+            <Text key={index}>{`${post.boardType} (${post.title})`}</Text>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -60,7 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 20,
-    paddingLeft : 16
+    paddingLeft: 16,
   },
   logo: {
     width: 50,
