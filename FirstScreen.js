@@ -1,18 +1,22 @@
-// 회원가입과 로그인 버튼이 있는 첫 화면
-
 import React from 'react';
-import { View, Image, Button, StyleSheet } from 'react-native';
+import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 const FirstScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <Image source={require('../assets/parachute.png')} style={styles.image} />
+      <View style={styles.imageContainer}>
+        <Image source={require('./assets/parachute.png')} style={styles.image} />
+      </View>
       <View style={styles.buttonContainer}>
-        <Button title="로그인" onPress={() => {}} color="#007bff" />
+        <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <Text style={styles.buttonText}>로그인</Text>
+        </TouchableOpacity>
         <View style={styles.spacing} />
-        <Button title="회원가입" onPress={() => {}} color="#007bff" />
+        <TouchableOpacity style={styles.button} onPress={() => {}}>
+          <Text style={styles.buttonText}>회원가입</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -22,21 +26,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#e3f2fd',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center', // 컨테이너 전체를 중앙으로 정렬
+  },
+  imageContainer: {
+    flex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: 150,
     height: 150,
-    marginBottom: 40,
   },
   buttonContainer: {
-    width: '80%',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 50,
+    width: '80%',
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#007bff',
+    padding: 15,
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
   },
   spacing: {
-    height: 10,
+    height: 15,
   },
 });
 
-export default FirstScreen
+export default FirstScreen;
