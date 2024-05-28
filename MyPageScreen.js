@@ -8,6 +8,9 @@ export default function MyPageScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>마이페이지</Text>
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangeUserInfo')}>
+        <Text style={styles.buttonText}>개인정보 확인</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ChangeUserInfo')}>
         <Text style={styles.buttonText}>개인정보 수정</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button}>
@@ -25,6 +28,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    paddingTop : 50,
   },
   title: {
     fontSize: 24,
