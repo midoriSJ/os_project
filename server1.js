@@ -9,10 +9,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const db = mysql.createConnection({
-  host: 'your-database-host',
-  user: 'your-database-username',
-  password: 'your-database-password',
-  database: 'your-database-name',
+  host: 'localhost',
+  user: 'root',
+  password: 'elskvhfh12',
+  database: 'paragliding_db',
 });
 
 db.connect(err => {
@@ -27,7 +27,7 @@ const transporter = nodemailer.createTransport({
   service: 'naver',
   auth: {
     user: 'nskfn02@naver.com',
-    pass: 'your-email-password', // 실제 이메일 비밀번호
+    pass: 'elskvhfh12',
   },
 });
 
@@ -45,6 +45,52 @@ app.post('/send-verification-code', (req, res) => {
       return res.status(500).send(error.toString());
     }
     res.send('Email sent: ' + info.response);
+  });
+});
+
+app.post('/check-duplicate', (req, res) => {
+  const { id } = req.body;
+  const query = 'SELECT COUNT(*) AS count FROM users WHERE id = ?';
+  db.query(query, [id], (error, results) => {
+    if (error) {
+      res.status(500).json({ error });
+    } else {
+      const isDuplicate = results[0].count > 0;
+      res.json({ isDuplicate });
+    }
+  });
+});
+
+app.post('/signup', (req, res) => {
+  const { id, pw, name, birth, phone, email } = req.body;
+  const query = 'INSERT INTO users (id, pw, name, birth, phone, email) VALUES (?, ?, ?, ?, ?, ?)';
+  db.query(query, [id, pw, name, birth, phone, email], (error, results) => {
+    if (error) {
+      res.status(500).json({ success: false, error });
+    } else {
+      res.json({ success: true });
+    }
+  });
+});
+
+app.post('/login', (req, res) => {
+  const { id, pw } = req.body;
+  const query = 'SELECT pw FROM users WHERE id = ?';
+  db.query(query, [id], (error, results) => {
+    if (error) {
+      res.status(500).json({ success: false, error });
+    } else {
+      if (results.length === 0) {
+        res.json({ success: false, error: 'invalid_id' });
+      } else {
+        const user = results[0];
+        if (user.pw !== pw) {
+          res.json({ success: false, error: 'invalid_pw' });
+        } else {
+          res.json({ success: true });
+        }
+      }
+    }
   });
 });
 

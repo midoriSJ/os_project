@@ -12,7 +12,8 @@ import LoginScreen from './screens/userInfo/LoginScreen';
 import AgreementScreen from './screens/userInfo/AgreementScreen';
 import FirstBowFactoryInfoScreen from './screens/bowFactory/FirstBowFactoryInfoScreen';
 import ChangeUserInfoScreen from './screens/userInfo/ChangeUserInfoScreen';
-import PostDetailScreen from './screens/post/PostDetailScreen'; // 추가된 import
+import PostDetailScreen from './screens/post/PostDetailScreen';
+import CheckUserInfo from './screens/userInfo/CheckUserInfo'; // CheckUserInfo import
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,7 +49,8 @@ export default function App() {
             <Stack.Screen name="SelectBowFactory" component={SelectBowFactoryScreen} />
             <Stack.Screen name="FirstBowFactoryInfo" component={FirstBowFactoryInfoScreen} />
             <Stack.Screen name="ChangeUserInfo" component={ChangeUserInfoScreen} />
-            <Stack.Screen name="PostDetail" component={PostDetailScreen} /> {/* 추가된 Stack.Screen */}
+            <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+            <Stack.Screen name="CheckUserInfo" component={CheckUserInfo} /> {/* CheckUserInfo 스크린 추가 */}
           </>
         )}
       </Stack.Navigator>
