@@ -37,3 +37,22 @@ create table board3 (                        -- 게시판 양식3
    image2 longblob                           -- 양식3 사진
 )
 
+-- 회원 정보 저장 테이블
+create table user_info (
+	user_id varchar(10) primary key,
+	user_pw varchar(20) not null,
+	name varchar(20) not null,
+	birth date not null,
+	phone int(12) not null,
+	email varchar(30) not null
+)
+
+-- 회원 동의 여부 저장 테이블
+CREATE TABLE user_agreements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    agree_all BOOLEAN NOT NULL,
+    agree_naver BOOLEAN NOT NULL,
+    agree_privacy BOOLEAN NOT NULL,
+    agree_real_name BOOLEAN NOT NULL
+);
