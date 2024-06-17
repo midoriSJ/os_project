@@ -1,33 +1,37 @@
-// 활공장 선택 누르면 나오는 페이지
-
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-
-const regions = [
-  { name: '서울', factories: ['대부도수련원 이륙장'] },
-  { name: '경기도', factories: ['경기 활공장1', '경기 활공장2'] },
-  { name: '강원도', factories: ['강원 활공장1', '강원 활공장2'] },
-  { name: '충청도', factories: ['충청 활공장1', '충청 활공장2'] },
-  { name: '경상도', factories: ['경상 활공장1', '경상 활공장2'] },
-  { name: '전라도', factories: ['전라 활공장1', '전라 활공장2'] },
-  { name: '제주', factories: ['제주 활공장1', '제주 활공장2'] },
-];
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import axios from 'axios';
 
 export default function SelectBowFactoryScreen({ navigation }) {
+  const [regions, setRegions] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [filteredFactories, setFilteredFactories] = useState([]);
   const [selectedFactory, setSelectedFactoryLocal] = useState(null);
 
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get('http://121.127.174.92:5000/factories');
+        setRegions(response.data);
+      } catch (error) {
+        console.error('Error fetching regions:', error);
+        Alert.alert('오류', '활공장 정보를 가져오는 중 오류가 발생했습니다.');
+      }
+    };
+
+    fetchRegions();
+  }, []);
+
   const handleSearch = (text) => {
     setSearchText(text);
     if (text) {
-      const filtered = regions.flatMap(region => 
+      const filtered = regions.flatMap(region =>
         region.factories.filter(factory => factory.includes(text))
       );
       setFilteredFactories(filtered);
     } else {
-      setFilteredFactories([]);
+      setFilteredFactories(selectedRegion ? selectedRegion.factories : []);
     }
   };
 
@@ -43,9 +47,9 @@ export default function SelectBowFactoryScreen({ navigation }) {
 
   const handleConfirm = () => {
     if (selectedFactory) {
-      navigation.navigate('BowFactory', { selectedFactory });
+      navigation.navigate('BowFactoryScreen', { selectedFactory });
     } else {
-      alert('활공장을 선택하세요.');
+      Alert.alert('선택 오류', '활공장을 선택하세요.');
     }
   };
 

@@ -2,19 +2,20 @@ import React from 'react';
 import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-const FirstScreen = () => {
+const FirstScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.imageContainer}>
-        <Image source={require('./assets/parachute.png')} style={styles.image} />
+        <Image source={require('../assets/parachute.png')} style={styles.image} />
+        <Text>GlideMate</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.buttonText}>로그인</Text>
         </TouchableOpacity>
         <View style={styles.spacing} />
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SignUp')}>
           <Text style={styles.buttonText}>회원가입</Text>
         </TouchableOpacity>
       </View>
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#e3f2fd',
     justifyContent: 'center',
-    alignItems: 'center', // 컨테이너 전체를 중앙으로 정렬
+    alignItems: 'center',
   },
   imageContainer: {
     flex: 2,

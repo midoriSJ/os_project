@@ -1,50 +1,50 @@
-// 활공장에 대한 자세한 정보를 출력하는 페이지
-
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
 
 export default function FirstBowFactoryInfoScreen({ route }) {
   const { selectedFactory } = route.params;
+  const [factoryDetails, setFactoryDetails] = useState({});
 
-  const factoryDetails = {
-    '대부도수련원 이륙장': {
-      temperature: '36.5°',
-      windDirection: '남서풍',
-      windSpeed: '3.4m/s',
-      cloudCoverage: '적음',
-      directions: '가는길 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~',
-      parking: '주차장소 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-    },
-    // 다른 활공장에 대한 정보 추가
-  };
+  useEffect(() => {
+    const fetchFactoryDetails = async () => {
+      try {
+        const response = await axios.get(`http://121.127.174.92:5000/factory-details?name=${selectedFactory}`);
+        setFactoryDetails(response.data);
+      } catch (error) {
+        console.error('Error fetching factory details:', error);
+        Alert.alert('오류', '활공장 정보를 가져오는 중 오류가 발생했습니다.');
+      }
+    };
 
-  const details = factoryDetails[selectedFactory] || {};
+    fetchFactoryDetails();
+  }, [selectedFactory]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{selectedFactory}</Text>
       <View style={styles.weatherContainer}>
-        <Text style={styles.weatherText}>36.5°</Text>
+        <Text style={styles.weatherText}>{factoryDetails.temperature || '-'}</Text>
         <Text style={styles.weatherInfo}>날씨특보 - </Text>
       </View>
       <View style={styles.infoContainer}>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>풍향</Text>
-          <Text style={styles.infoContent}>{details.windDirection}</Text>
+          <Text style={styles.infoContent}>{factoryDetails.windDirection || '-'}</Text>
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>풍속</Text>
-          <Text style={styles.infoContent}>{details.windSpeed}</Text>
+          <Text style={styles.infoContent}>{factoryDetails.windSpeed || '-'}</Text>
         </View>
         <View style={styles.infoBox}>
           <Text style={styles.infoTitle}>구름양</Text>
-          <Text style={styles.infoContent}>{details.cloudCoverage}</Text>
+          <Text style={styles.infoContent}>{factoryDetails.cloudCoverage || '-'}</Text>
         </View>
       </View>
       <Text style={styles.subTitle}>가는길</Text>
-      <Text style={styles.detailsText}>{details.directions}</Text>
+      <Text style={styles.detailsText}>{factoryDetails.directions || '-'}</Text>
       <Text style={styles.subTitle}>주차장소</Text>
-      <Text style={styles.detailsText}>{details.parking}</Text>
+      <Text style={styles.detailsText}>{factoryDetails.parking || '-'}</Text>
     </View>
   );
 }

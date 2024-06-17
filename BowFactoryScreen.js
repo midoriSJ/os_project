@@ -1,34 +1,161 @@
-// 활공장 선택하는 메인 페이지
-
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import axios from 'axios';
 
 export default function BowFactoryScreen({ route, navigation }) {
-  const selectedFactory = route.params?.selectedFactory || '활공장을 선택해 주세요';
+  const [selectedFactory, setSelectedFactory] = useState('활공장을 선택해 주세요');
+  const [summaryData, setSummaryData] = useState({});
 
-  const summaryData = {
-    '대부도수련원 이륙장': '대부도수련원 이륙장은 서울에 위치한 대표적인 활공장입니다.',
-    '경기 활공장1': '경기 활공장1은 경기도에 위치한 활공장으로, 초보자에게 적합합니다.',
-    // 다른 활공장에 대한 요약 추가
+  useEffect(() => {
+    if (route.params?.selectedFactory) {
+      setSelectedFactory(route.params.selectedFactory);
+    }
+  }, [route.params?.selectedFactory]);
+
+  useEffect(() => {
+    const fetchSummaryData = async () => {
+      try {
+        const response = await axios.get('http://121.127.174.92:5000/factories');
+        const data = response.data.reduce((acc, factory) => {
+          acc[factory.name] = factory.summary;
+          return acc;
+        }, {});
+        setSummaryData(data);
+      } catch (error) {
+        console.error('Error fetching factory data:', error);
+      }
+    };
+
+    fetchSummaryData();
+  }, []);
+
+  const getImageSource = (factoryName) => {
+    const images = {
+      '각산이륙장': require('../assets/GakSanTakeOff.png'),
+      '간월재이륙장': require('../assets/GanWolJaeTakeOff.png'),
+      '감악산이륙장': require('../assets/GamakSanTakeOff.png'),
+      '경각산이륙장': require('../assets/GyeongGakSanTakeOff.png'),
+      '계룡산이륙장': require('../assets/GyeRyeongSanTakeOff.png'),
+      '고근산이륙장': require('../assets/GoGeunSanTakeOff.png'),
+      '고헌산(곰돌이)이륙장': require('../assets/GoHeonSanGomDoliTakeOff.png'),
+      '관모산이륙장': require('../assets/GwanMoSanTakeOff.png'),
+      '광교산이륙장': require('../assets/GwangGyoSanTakeOff.png'),
+      '광의이륙장': require('../assets/GwangUiTakeOff.png'),
+      '괘방산 활공장': require('../assets/GwaeBangSanTakeOff.png'),
+      '국당이륙장': require('../assets/GukDangTakeOff.png'),
+      '금오름이륙장': require('../assets/GeumOReumTakeOff.png'),
+      '기룡산 이륙장': require('../assets/GiRyeongSanTakeOff.png'),
+      '남산 이륙장': require('../assets/NamSanTakeOff.png'),
+      '남포이륙장': require('../assets/NamPoTakeOff.png'),
+      '노안이륙장': require('../assets/NoAnTakeOff.png'),
+      '논개이륙장': require('../assets/NonGaeTakeOff.png'),
+      '달마산이륙장': require('../assets/DalMaSanTakeOff.png'),
+      '대관령 활공장': require('../assets/DaeGwanRyeongTakeOff.png'),
+      '대니산이륙장': require('../assets/DaeNiSanTakeOff.png'),
+      '대릉산 이륙장': require('../assets/DaeReungSanTakeOff.png'),
+      '대부도 구봉산 이륙장': require('../assets/DaeBuDoGuBongSanTakeOff.png'),
+      '대암산이륙장': require('../assets/DaeAmSanTakeOff.png'),
+      '덕기봉이륙장': require('../assets/DeokGiBongTakeOff.png'),
+      '도비산 활공장': require('../assets/DoBiSanTakeOff.png'),
+      '두산 활공장': require('../assets/DuSanTakeOff.png'),
+      '마래산이륙장': require('../assets/MaRaeSanTakeOff.png'),
+      '망실봉이륙장': require('../assets/MangSilBongTakeOff.png'),
+      '망운산이륙장': require('../assets/MangUnSanTakeOff.png'),
+      '매산리 활공장': require('../assets/MaeSanRiTakeOff.png'),
+      '무릉 활공장': require('../assets/MuReungTakeOff.png'),
+      '무주이륙장': require('../assets/MuJuTakeOff.png'),
+      '무척산이륙장': require('../assets/MuCheokSanTakeOff.png'),
+      '문경활공랜드': require('../assets/MunGyeongTakeOff.png'),
+      '미륵산이륙장': require('../assets/MiReukSanTakeOff.png'),
+      '미시령 활공장': require('../assets/MiSiRyeongTakeOff.png'),
+      '바람재이륙장': require('../assets/BaRamJaeTakeOff.png'),
+      '박달산 활공장': require('../assets/BakDalSanTakeOff.png'),
+      '발례이륙장': require('../assets/BalRyeTakeOff.png'),
+      '방광산이륙장': require('../assets/BangGwangSanTakeOff.png'),
+      '방장산이륙장': require('../assets/BangJangSanTakeOff.png'),
+      '백월산이륙장': require('../assets/BaekWolSanTakeOff.png'),
+      '백화산이륙장': require('../assets/BaekHwaSanTakeOff.png'),
+      '벽도산이륙장': require('../assets/ByeokDoSanTakeOff.png'),
+      '봉래산이륙장': require('../assets/BongRaeSanTakeOff.png'),
+      '봉수대이륙장': require('../assets/BongSuDaeTakeOff.png'),
+      '봉화산(당진) 활공장': require('../assets/BongHwaSanDanginTakeOff.png'),
+      '봉화산이륙장': require('../assets/BongHwaSanTakeOff.png'),
+      '불탄산이륙장': require('../assets/BulTanSanTakeOff.png'),
+      '사곡이륙장': require('../assets/SaGokTakeOff.png'),
+      '사명산이륙장': require('../assets/SaMyeongSanTakeOff.png'),
+      '사자산이륙장': require('../assets/SaJaSanTakeOff.png'),
+      '새별오름이륙장': require('../assets/SaeByeolOreumTakeOff.png'),
+      '서독산 활공장': require('../assets/SeoDokSanTakeOff.png'),
+      '서우봉이륙장': require('../assets/SeoUBongTakeOff.png'),
+      '서운산 활공장': require('../assets/SeoUnSanTakeOff.png'),
+      '송라산 활공장': require('../assets/SongRaSanTakeOff.png'),
+      '식장산이륙장': require('../assets/SikJangSanTakeOff.png'),
+      '안동길안이륙장': require('../assets/AnDongGilAnTakeOff.png'),
+      '양백산이륙장': require('../assets/YangBaekSanTakeOff.png'),
+      '어섬 활공장': require('../assets/EOSeomTakeOff.png'),
+      '연화산이륙장': require('../assets/YeonHwaSanTakeOff.png'),
+      '예봉산이륙장': require('../assets/YeBongSanTakeOff.png'),
+      '오봉산이륙장': require('../assets/OBongSanTakeOff.png'),
+      '오산이륙장': require('../assets/OSanTakeOff.png'),
+      '오서산 활공장': require('../assets/OSeoSanTakeOff.png'),
+      '오성산이륙장': require('../assets/OSungSanTakeOff.png'),
+      '와룡산이륙장': require('../assets/WaRyeongSanTakeOff.png'),
+      '와우정사 활공장': require('../assets/WaUJeongSaTakeOff.png'),
+      '왜목 활공장': require('../assets/WaeMokTakeOff.png'),
+      '원적산이륙장': require('../assets/WonJeokSanTakeOff.png'),
+      '월랑봉이륙장': require('../assets/WolRangBongTakeOff.png'),
+      '유명산 활공장': require('../assets/YuMyeongSanTakeOff.png'),
+      '은봉산 활공장': require('../assets/EunBongSanTakeOff.png'),
+      '음달산이륙장': require('../assets/EumDalSanTakeOff.png'),
+      '자양산이륙장': require('../assets/JaYangSanTakeOff.png'),
+      '장동산이륙장': require('../assets/JangDongSanTakeOff.png'),
+      '장암산 활공장': require('../assets/JangAmSanTakeOff.png'),
+      '장암산이륙장': require('../assets/JangAmTakeOff.png'),
+      '재석산이륙장': require('../assets/JaeSeokSanTakeOff.png'),
+      '정광산이륙장': require('../assets/JeongGwangSanTakeOff.png'),
+      '주월산이륙장': require('../assets/JuWolSanTakeOff.png'),
+      '주작산이륙장': require('../assets/JuJakSanTakeOff.png'),
+      '진례이륙장': require('../assets/JinRyeTakeOff.png'),
+      '진천 활공장': require('../assets/JinCheonTakeOff.png'),
+      '창평이륙장': require('../assets/ChangPyeongTakeOff.png'),
+      '초록봉 활공장': require('../assets/ChoRokBongTakeOff.png'),
+      '칠포이륙장': require('../assets/ChilPoTakeOff.png'),
+      '특리이륙장': require('../assets/TeukRiTakeOff.png'),
+      '한우산이륙장': require('../assets/HanUSanTakeOff.png'),
+      '향적봉이륙장': require('../assets/HyangJeokBongTakeOff.png'),
+      '형제봉이륙장': require('../assets/HyeongJeBongTakeOff.png'),
+      '혜음령이륙장': require('../assets/HyeEumRyeongTakeOff.png'),
+      '호락산이륙장': require('../assets/HoRakSanTakeOff.png'),
+      '화순이륙장': require('../assets/HwaSunTakeOff.png'),
+      '황금산이륙장': require('../assets/HwangGeumSanTakeOff.png'),
+      '황령산이륙장': require('../assets/HwangRyeongSanTakeOff.png'),
+      '혹성산이륙장': require('../assets/HokSeongSanTakeOff.png')
+    };
+    return images[factoryName] || require('../assets/default.png');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>활공장</Text>
       <View style={styles.selectedFactoryContainer}>
         <Text style={styles.selectedFactoryText}>{selectedFactory}</Text>
-        <TouchableOpacity style={styles.selectButton} onPress={() => navigation.navigate('SelectBowFactory')}>
+        <TouchableOpacity style={styles.selectButton} onPress={() => navigation.navigate('SelectBowFactoryScreen')}>
           <Text style={styles.buttonText}>선택</Text>
         </TouchableOpacity>
       </View>
       {selectedFactory !== '활공장을 선택해 주세요' && (
-        <TouchableOpacity
-          style={styles.summaryContainer}
-          onPress={() => navigation.navigate('FirstBowFactoryInfo', { selectedFactory })}
-        >
-          <Text style={styles.summaryTitle}>{selectedFactory}</Text>
-          <Text style={styles.summaryText}>{summaryData[selectedFactory]}</Text>
-        </TouchableOpacity>
+        <View style={styles.detailsContainer}>
+          <TouchableOpacity
+            style={styles.summaryContainer}
+            onPress={() => navigation.navigate('FirstBowFactoryInfoScreen', { selectedFactory })}
+          >
+            <Text style={styles.summaryTitle}>{selectedFactory}</Text>
+            <Text style={styles.summaryText}>{summaryData[selectedFactory]}</Text>
+          </TouchableOpacity>
+          <Image
+            source={getImageSource(selectedFactory)}
+            style={styles.factoryImage}
+          />
+        </View>
       )}
     </View>
   );
@@ -39,11 +166,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   selectedFactoryContainer: {
     padding: 20,
@@ -67,8 +189,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  summaryContainer: {
+  detailsContainer: {
     marginTop: 20,
+  },
+  summaryContainer: {
+    marginBottom: 20,
     padding: 20,
     borderRadius: 10,
     borderWidth: 1,
@@ -81,5 +206,10 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     fontSize: 16,
+  },
+  factoryImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
   },
 });

@@ -1,115 +1,84 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import SignUpScreen from './screens/SignUpScreen';
+import HomeScreen from './screens/HomeScreen';
+import BoardScreen from './screens/BoardScreen';
+import MyPageScreen from './screens/MyPageScreen';
+import FirstScreen from './screens/FirstScreen';
+import LoginScreen from './screens/LoginScreen';
+import BowFactoryScreen from './screens/BowFactoryScreen';
+import FirstBowFactoryInfoScreen from './screens/FirstBowFactoryInfoScreen';
+import SelectBowFactoryScreen from './screens/SelectBowFactoryScreen';
+import ChangeUserInfoScreen from './screens/ChangeUserInfoScreen'; // 추가
+import CheckUserInfoScreen from './screens/CheckUserInfoScreen'; // 추가
+import DeleteAccountScreen from './screens/DeleteAccountScreen'; // 추가
 
-export default function App() {
-  const [weatherData, setWeatherData] = useState(null);
-  const [airData, setAirData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const fetchWeatherData = async () => {
-    try {
-      const apiKey = '111002b452c141798051161faec61742';
-      const city = 'Cheonan'; // 원하는 도시로 변경하세요.
-      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-      const response = await axios.get(apiUrl);
-      setWeatherData(response.data);
-      await postDataToServer(response.data); // 수정: 날씨 데이터 전송
-    } catch (error) {
-      console.error('Error fetching weather data:', error);
-    }
-  };
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-  const fetchAirData = async () => {
-    try {
-      const apiKey = '111002b452c141798051161faec61742';
-      const airUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=36.8065&lon=127.1522&appid=${apiKey}&units=metric`
-   
-      const response = await axios.get(airUrl);
-      setAirData(response.data);
-      await postDataToServer(response.data); // 수정: 대기 오염 데이터 전송
-    } catch (error) {
-      console.error('Error fetching air pollution data:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      await fetchWeatherData();
-      await fetchAirData();
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const postDataToServer = async (data) => {
-    try {
-      await axios.post("http://127.0.0.1:5000/api/data", { data });
-      console.log('Data posted successfully');
-    } catch (error) {
-      console.error('Error posting data to server:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
-  if (!weatherData) {
-    return (
-      <View style={styles.container}>
-        <Text>Error fetching weather data</Text>
-      </View>
-    );
-  }
-  if (!airData) {
-    return (
-      <View style={styles.container}>
-        <Text>Error fetching air pollution data</Text>
-      </View>
-    );
-  }
-
+function HomeTabs() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Current Weather</Text>
-      <Text style={styles.weather}>City : {weatherData.name}</Text>
-      <Text style={styles.weather}>Temperature : {weatherData.main.temp}°C</Text>
-      <Text style={styles.weather}>Feels Like : {weatherData.main.feels_like}°C</Text>
-      <Text style={styles.weather}>Temp_min : {weatherData.main.temp_min}°C</Text>
-      <Text style={styles.weather}>Temp_max : {weatherData.main.temp_max}°C</Text>
-      <Text style={styles.weather}>Humidity : {weatherData.main.humidity} %</Text>
-      <Text style={styles.weather}>Pressure : {weatherData.main.pressure} hPa</Text>
-      <Text style={styles.weather}>Wind : {weatherData.wind.speed} m/sec</Text>
-      <Text style={styles.list}>pm2.5 : {airData.list[0].components.pm2_5} ㎍/㎥</Text>
-      <Text style={styles.list}>pm10 : {airData.list[0].components.pm10} ㎍/㎥</Text>
-      <Text style={styles.weather}>Description : {weatherData.weather[0].description}</Text>
-    </View>
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === '홈') {
+            iconName = 'home';
+          } else if (route.name === '게시판') {
+            iconName = 'list';
+          } else if (route.name === '마이페이지') {
+            iconName = 'person';
+          } else if (route.name === '활공장') {
+            iconName = 'map';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="홈" component={HomeScreen} />
+      <Tab.Screen name="활공장" component={BowFactoryScreen} />
+      <Tab.Screen name="게시판" component={BoardScreen} />
+      <Tab.Screen name="마이페이지" component={MyPageScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  weather: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  list : {
-    fontSize : 18,
-    marginBottom : 10,
-  },
-});
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        setIsLoggedIn(true);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="FirstScreen">
+        <Stack.Screen name="FirstScreen" component={FirstScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login">
+          {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+        </Stack.Screen>
+        <Stack.Screen name="SignUp" component={SignUpScreen} />
+        {isLoggedIn && (
+          <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+        )}
+        <Stack.Screen name="ChangeUserInfo" component={ChangeUserInfoScreen} options={{ title: "개인정보 수정" }} />
+        <Stack.Screen name="CheckUserInfo" component={CheckUserInfoScreen} />
+        <Stack.Screen name="DeleteAccount" component={DeleteAccountScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}

@@ -1,30 +1,9 @@
-// BoardScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-const samplePosts = [
-  {
-    boardType: '자유게시판',
-    title: '제목1',
-    content: '내용1',
-    author: '아이디1',
-    createdAt: '2024.5.26',
-    comments: [
-      { author: '아이디1', content: '댓글1', createdAt: '2024.5.26 20:19' },
-      { author: '아이디2', content: '댓글2', createdAt: '2024.5.26 20:19' },
-    ],
-  },
-  {
-    boardType: '모임게시판',
-    title: '제목2',
-    content: '내용2',
-    author: '아이디2',
-    createdAt: '2024.5.26',
-    comments: [],
-  },
-  // 다른 게시글들...
-];
+import axios from 'axios';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function BoardScreen() {
   const [selectedTab, setSelectedTab] = useState('자유게시판');
@@ -32,16 +11,39 @@ export default function BoardScreen() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    setFilteredPosts(samplePosts.filter(post => post.boardType === selectedTab));
+    const fetchPosts = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await axios.get(`http://121.127.174.92:5000/api/getPosts`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { type: selectedTab }
+        });
+        setFilteredPosts(response.data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        Alert.alert('오류', '게시글을 가져오는 중 문제가 발생했습니다.');
+      }
+    };
+
+    fetchPosts();
   }, [selectedTab]);
 
   const navigateToPostDetail = (post) => {
     navigation.navigate('PostDetail', { post, boardTitle: selectedTab });
   };
 
+  const navigateToWritePost = () => {
+    navigation.navigate('WritePost');
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>게시판</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>게시판</Text>
+        <TouchableOpacity onPress={navigateToWritePost}>
+          <Ionicons name="add-circle-outline" size={30} color="#007bff" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity onPress={() => setSelectedTab('자유게시판')}>
           <Text style={[styles.tab, selectedTab === '자유게시판' && styles.activeTab]}>자유게시판</Text>
@@ -70,11 +72,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    paddingTop: 50,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
   },
   tabContainer: {
     flexDirection: 'row',

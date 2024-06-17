@@ -1,47 +1,45 @@
-// 회원탈퇴 페이지
-
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DeleteAccountScreen({ navigation }) {
   const [password, setPassword] = useState('');
 
   const handleDeleteAccount = async () => {
     try {
-      const response = await fetch('https://your-api-endpoint.com/delete-user', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          password,
-        }),
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.delete('http://121.127.174.92:5000/api/delete-user', {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { password },
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // 성공적으로 삭제된 경우 로그인 페이지로 이동
-        alert('회원 탈퇴가 성공적으로 처리되었습니다.');
-        navigation.navigate('Login');
+      if (response.data.success) {
+        Alert.alert(
+          '성공',
+          '회원 탈퇴가 성공적으로 처리되었습니다.',
+          [
+            {
+              text: '확인',
+              onPress: async () => {
+                await AsyncStorage.removeItem('token');
+                navigation.navigate('FirstScreen');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       } else {
-        // 삭제 실패 시 에러 메시지 출력
-        alert(result.message || '회원 탈퇴에 실패했습니다.');
+        Alert.alert('실패', response.data.message || '회원 탈퇴에 실패했습니다.');
       }
     } catch (error) {
       console.error(error);
-      alert('회원 탈퇴 중 오류가 발생했습니다.');
+      Alert.alert('오류', '회원 탈퇴 중 오류가 발생했습니다.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>회원탈퇴</Text>
-      </View>
       <TextInput
         style={styles.input}
         placeholder="비밀번호를 입력하세요."
@@ -61,7 +59,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
-    paddingTop : 50,
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',

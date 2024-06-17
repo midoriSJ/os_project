@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 export default function PostDetailScreen({ route }) {
   const { post, boardTitle } = route.params;
-  const [comments, setComments] = useState([
-    { id: 1, user: '아이디', content: '댓글~~~\n댓글~~~', date: '5/26 20:19' },
-    { id: 2, user: '아이디', content: '댓글~~~\n댓글~~~', date: '5/26 20:19' }
-  ]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const navigation = useNavigation();
 
-  const handleAddComment = () => {
-    const newComments = [...comments, { id: comments.length + 1, user: '아이디', content: newComment, date: new Date().toLocaleString() }];
-    setComments(newComments);
-    setNewComment('');
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(`http://192.168.147.130:5000/posts/${post.id}/comments`);
+        setComments(response.data);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+
+    fetchComments();
+  }, [post.id]);
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      Alert.alert('댓글을 입력하세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`http://192.168.147.130:5000/posts/${post.id}/comments`, {
+        content: newComment,
+      });
+
+      if (response.data.success) {
+        setComments([...comments, response.data.comment]);
+        setNewComment('');
+      } else {
+        Alert.alert('댓글 추가 실패', response.data.message || '댓글 추가에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      Alert.alert('댓글 추가 실패', '서버와 통신 중 문제가 발생했습니다.');
+    }
   };
 
   return (
@@ -33,8 +61,8 @@ export default function PostDetailScreen({ route }) {
           <View style={styles.postHeader}>
             <Image source={require('../assets/avatar.png')} style={styles.avatar} />
             <View>
-              <Text style={styles.username}>아이디</Text>
-              <Text style={styles.date}>2024.5.26</Text>
+              <Text style={styles.username}>{post.author}</Text>
+              <Text style={styles.date}>{post.createdAt}</Text>
             </View>
           </View>
           <Text style={styles.postTitle}>{post.title}</Text>

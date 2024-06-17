@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image, Alert } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation, setIsLoggedIn }) {
   const [id, setId] = useState('');
@@ -8,20 +9,28 @@ export default function LoginScreen({ navigation, setIsLoggedIn }) {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://your-server-ip:3000/login', {
-        id,
-        pw,
+      const response = await axios.post('http://121.127.174.92:5000/api/login', {
+        username: id,
+        password: pw,
       });
+      console.log(response.data);  // 서버 응답 출력
 
-      if (response.data.success) {
-        setIsLoggedIn(true);
-        navigation.navigate('MainTabs'); // 로그인 성공 시 MainTabs로 이동
-      } else if (response.data.error === 'invalid_id') {
-        Alert.alert('로그인 실패', '잘못된 아이디입니다.');
-      } else if (response.data.error === 'invalid_pw') {
-        Alert.alert('로그인 실패', '비밀번호가 일치하지 않습니다.');
+      if (response.status === 200 && response.data.message === "Login successful") {
+        if (response.data.token) {
+          await AsyncStorage.setItem('token', response.data.token); // 토큰 저장
+          setIsLoggedIn(true); // 로그인 상태 업데이트
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'HomeTabs' }],
+          }); // 로그인 성공 시 HomeTabs로 이동
+        } else {
+          Alert.alert('로그인 실패', '토큰이 없습니다.');
+        }
+      } else {
+        Alert.alert('로그인 실패', response.data.message || '알 수 없는 오류가 발생했습니다.');
       }
     } catch (error) {
+      console.error(error);  // 에러 출력
       Alert.alert('로그인 실패', '서버와 통신 중 문제가 발생했습니다.');
     }
   };
@@ -30,7 +39,7 @@ export default function LoginScreen({ navigation, setIsLoggedIn }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image source={require('../assets/parachute.png')} style={styles.logo} />
-        <Text style={styles.title}>(사이트이름)</Text>
+        <Text style={styles.title}>GlideMate</Text>
       </View>
       <View style={styles.inputContainer}>
         <TextInput

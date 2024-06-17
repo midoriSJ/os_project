@@ -1,50 +1,72 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const [posts, setPosts] = useState([]);
+  const [weather, setWeather] = useState({});
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('http://your-server-ip:3000/recent-posts');
+        const token = await AsyncStorage.getItem('token');
+        const response = await axios.get('http://121.127.174.92:5000/api/getPosts', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Posts fetched:', response.data);
         setPosts(response.data);
       } catch (error) {
         console.error('Error fetching posts:', error);
+        Alert.alert('오류', '게시물을 가져오는 중 오류가 발생했습니다.');
+      }
+    };
+
+    const fetchWeather = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await axios.get('http://121.127.174.92:5000/api/weather', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('Weather fetched:', response.data);
+        setWeather(response.data);
+      } catch (error) {
+        console.error('Error fetching weather:', error);
+        Alert.alert('오류', '날씨 정보를 가져오는 중 오류가 발생했습니다.');
       }
     };
 
     fetchPosts();
+    fetchWeather();
   }, []);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image source={require('../assets/parachute.png')} style={styles.logo} />
-        <Text style={styles.siteName}>(사이트이름)</Text>
+        <Text style={styles.siteName}>GlideMate</Text>
       </View>
       <View style={styles.weatherSection}>
         <Text style={styles.sectionTitle}>활공장</Text>
         <View style={styles.weatherCard}>
-          <Text style={styles.weatherLocation}>~~ 활공장</Text>
+          <Text style={styles.weatherLocation}>{weather.location || '활공장 정보 없음'}</Text>
           <View style={styles.weatherInfo}>
-            <Image source={{ uri: 'https://i.imgur.com/llF5iyg.png' }} style={styles.weatherIcon} />
-            <Text style={styles.temperature}>36.5°</Text>
-            <Text style={styles.weatherDetails}>날씨특보 -</Text>
+            <Image source={{ uri: weather.icon || 'https://i.imgur.com/llF5iyg.png' }} style={styles.weatherIcon} />
+            <Text style={styles.temperature}>{weather.temperature || '-'}</Text>
+            <Text style={styles.weatherDetails}>{weather.alert || '날씨특보 없음'}</Text>
           </View>
           <View style={styles.weatherStats}>
             <View style={styles.weatherStat}>
               <Text style={styles.weatherStatLabel}>풍향</Text>
-              <Text style={styles.weatherStatValue}>남서풍</Text>
+              <Text style={styles.weatherStatValue}>{weather.windDirection || '-'}</Text>
             </View>
             <View style={styles.weatherStat}>
               <Text style={styles.weatherStatLabel}>풍속</Text>
-              <Text style={styles.weatherStatValue}>3.4m/s</Text>
+              <Text style={styles.weatherStatValue}>{weather.windSpeed || '-'}</Text>
             </View>
             <View style={styles.weatherStat}>
               <Text style={styles.weatherStatLabel}>구름양</Text>
-              <Text style={styles.weatherStatValue}>적음</Text>
+              <Text style={styles.weatherStatValue}>{weather.cloudCoverage || '-'}</Text>
             </View>
           </View>
         </View>
@@ -52,9 +74,13 @@ export default function HomeScreen() {
       <View style={styles.boardSection}>
         <Text style={styles.sectionTitle}>게시판</Text>
         <View style={styles.boardCard}>
-          {posts.map((post, index) => (
-            <Text key={index}>{`${post.boardType} (${post.title})`}</Text>
-          ))}
+          {posts.length > 0 ? (
+            posts.map((post, index) => (
+              <Text key={index}>{`${post.boardType} (${post.title})`}</Text>
+            ))
+          ) : (
+            <Text>게시물이 없습니다.</Text>
+          )}
         </View>
       </View>
     </ScrollView>
